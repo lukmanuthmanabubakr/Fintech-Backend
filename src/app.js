@@ -4,7 +4,9 @@ import helmet from "helmet";
 import { prisma } from "./config/db.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
-import { requireAuth } from "./middlewares/auth.middleware.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "../docs/swagger.js";
+
 
 const app = express();
 
@@ -25,13 +27,12 @@ app.get("/db-test", async (req, res, next) => {
   }
 });
 
-app.get("/me", requireAuth, (req, res) => {
-  res.json({ ok: true, user: req.user });
-});
 
 
 app.use("/api/v1/auth", authRoutes);
 
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(errorMiddleware);
 
 export default app;
