@@ -5,7 +5,7 @@ export async function register(req, res, next) {
   try {
     const payload = registerSchema.parse(req.body);
 
-    const user = await registerUser({
+    const data = await registerUser({
       fullName: payload.fullName,
       email: payload.email,
       password: payload.password,
@@ -14,7 +14,7 @@ export async function register(req, res, next) {
     return res.status(201).json({
       success: true,
       message: "User registered",
-      data: user,
+      data,
     });
   } catch (err) {
     next(err);
