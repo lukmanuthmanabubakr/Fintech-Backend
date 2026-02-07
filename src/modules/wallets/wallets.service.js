@@ -50,7 +50,7 @@ export async function creditWallet({ userId, amount, currency = "USD" }) {
       },
     });
 
-    // update balances (cached balance approach)
+    // update balances (cached balance approach).
     await tx.wallet.update({
       where: { id: userWallet.id },
       data: { balance: { increment: amount } },
