@@ -12,12 +12,24 @@ export async function registerUser({ fullName, email, password }) {
 
   const hashed = await bcrypt.hash(password, 12);
 
-  const user = await prisma.user.create({
-    data: { fullName, email, password: hashed },
-    select: { id: true, fullName: true, email: true, createdAt: true },
+  const result = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: { fullName, email, password: hashed },
+      select: { id: true, fullName: true, email: true, createdAt: true },
+    });
+
+    const wallet = await tx.wallet.create({
+      data: {
+        userId: user.id,
+        currency: "USD",
+      },
+      select: { id: true, currency: true, createdAt: true },
+    });
+
+    return { user, wallet };
   });
 
-  return user;
+  return result;
 }
 
 export async function loginUser({ email, password }) {

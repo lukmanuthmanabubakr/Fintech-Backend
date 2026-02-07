@@ -6,6 +6,8 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "../docs/swagger.js";
+import walletsRoutes from "./modules/wallets/wallets.routes.js";
+
 
 
 const app = express();
@@ -30,6 +32,8 @@ app.get("/db-test", async (req, res, next) => {
 
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/wallets", walletsRoutes);
+
 
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
