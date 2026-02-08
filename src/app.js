@@ -7,6 +7,9 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "../docs/swagger.js";
 import walletsRoutes from "./modules/wallets/wallets.routes.js";
+import transactionsRoutes from "./modules/transactions/transactions.routes.js";
+
+
 
 
 
@@ -33,6 +36,7 @@ app.get("/db-test", async (req, res, next) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/wallets", walletsRoutes);
+app.use("/api/v1/transactions", transactionsRoutes);
 
 
 

@@ -21,7 +21,7 @@ function makeRef() {
 
 export async function creditWallet({ userId, amount, currency = "USD" }) {
   if (!Number.isInteger(amount) || amount <= 0) {
-    const err = new Error("amount must be a positive integer (kobo)");
+    const err = new Error("amount must be a positive integer");
     err.statusCode = 400;
     throw err;
   }
@@ -79,7 +79,7 @@ export async function creditWallet({ userId, amount, currency = "USD" }) {
 
 export async function debitWallet({ userId, amount, currency = "USD" }) {
   if (!Number.isInteger(amount) || amount <= 0) {
-    const err = new Error("amount must be a positive integer (kobo)");
+    const err = new Error("amount must be a positive integer");
     err.statusCode = 400;
     throw err;
   }
@@ -108,7 +108,7 @@ export async function debitWallet({ userId, amount, currency = "USD" }) {
       },
     });
 
-    // ✅ Prevent negative balance (atomic)
+    // To Prevent negative balance (atomic)
     const updated = await tx.wallet.updateMany({
       where: { id: userWallet.id, balance: { gte: amount } },
       data: { balance: { decrement: amount } },
