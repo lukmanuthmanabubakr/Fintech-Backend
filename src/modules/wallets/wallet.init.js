@@ -14,7 +14,7 @@ export async function ensureClearingWallet() {
   const w = await prisma.wallet.create({
     data: {
       isSystem: true,
-      currency: "USD",
+      currency: "NGN",
       balance: 0,
       userId: null,
     },

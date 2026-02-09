@@ -1,6 +1,6 @@
 import { prisma } from "../../config/db.js";
 
-async function getClearingWallet(tx, currency = "USD") {
+async function getClearingWallet(tx, currency = "NGN") {
   const w = await tx.wallet.findFirst({
     where: { isSystem: true, currency },
     select: { id: true },
@@ -19,9 +19,9 @@ function makeRef() {
   return `TX-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 }
 
-export async function creditWallet({ userId, amount, currency = "USD" }) {
+export async function creditWallet({ userId, amount, currency = "NGN" }) {
   if (!Number.isInteger(amount) || amount <= 0) {
-    const err = new Error("amount must be a positive integer");
+    const err = new Error("amount must be a positive integer (kobo)");
     err.statusCode = 400;
     throw err;
   }
@@ -50,7 +50,6 @@ export async function creditWallet({ userId, amount, currency = "USD" }) {
       },
     });
 
-    // update balances (cached balance approach).
     await tx.wallet.update({
       where: { id: userWallet.id },
       data: { balance: { increment: amount } },
@@ -77,9 +76,9 @@ export async function creditWallet({ userId, amount, currency = "USD" }) {
   });
 }
 
-export async function debitWallet({ userId, amount, currency = "USD" }) {
+export async function debitWallet({ userId, amount, currency = "NGN" }) {
   if (!Number.isInteger(amount) || amount <= 0) {
-    const err = new Error("amount must be a positive integer");
+    const err = new Error("amount must be a positive integer (kobo)");
     err.statusCode = 400;
     throw err;
   }

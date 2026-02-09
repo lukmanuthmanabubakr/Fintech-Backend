@@ -21,7 +21,7 @@ export async function registerUser({ fullName, email, password }) {
     const wallet = await tx.wallet.create({
       data: {
         userId: user.id,
-        currency: "USD",
+        currency: "NGN",
       },
       select: { id: true, currency: true, createdAt: true },
     });
