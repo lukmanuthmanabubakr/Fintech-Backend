@@ -1,21 +1,17 @@
 import { fetchTransactionByReference, fetchUserTransactions } from "./transactions.service.js";
+import { formatTransactionForUser, formatTransactionsForUser } from "../../utils/formatters.js";
 
 export async function getMyTransactions(req, res, next) {
   try {
     const userId = Number(req.user.sub);
-
     const { page, limit } = req.query;
 
-    const result = await fetchUserTransactions({
-      userId,
-      page,
-      limit,
-    });
+    const result = await fetchUserTransactions({ userId, page, limit });
 
     return res.json({
       success: true,
       meta: result.meta,
-      data: result.items,
+      data: formatTransactionsForUser(result.items),
     });
   } catch (err) {
     next(err);
@@ -38,7 +34,7 @@ export async function getMyTransactionByReference(req, res, next) {
 
     return res.json({
       success: true,
-      data: txn,
+      data: formatTransactionForUser(txn),
     });
   } catch (err) {
     next(err);

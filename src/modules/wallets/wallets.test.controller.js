@@ -29,7 +29,7 @@ export async function testCredit(req, res, next) {
   try {
     const userId = toPositiveInt(req.body.userId, "userId");
     const amount = toPositiveInt(req.body.amount, "amount");
-    const currency = typeof req.body.currency === "string" ? req.body.currency : "USD";
+    const currency = typeof req.body.currency === "string" ? req.body.currency : "NGN";
 
     const result = await creditWallet({ userId, amount, currency });
 
@@ -52,7 +52,7 @@ export async function testDebit(req, res, next) {
   try {
     const userId = toPositiveInt(req.body.userId, "userId");
     const amount = toPositiveInt(req.body.amount, "amount");
-    const currency = typeof req.body.currency === "string" ? req.body.currency : "USD";
+    const currency = typeof req.body.currency === "string" ? req.body.currency : "NGN";
 
     const result = await debitWallet({ userId, amount, currency });
 
@@ -77,7 +77,7 @@ export async function testConcurrency(req, res, next) {
     const amount = toPositiveInt(req.body.amount, "amount");
     const attemptsRaw = toInt(req.body.attempts, "attempts");
     const attempts = Math.min(Math.max(attemptsRaw, 1), 50); // clamp 1..50
-    const currency = typeof req.body.currency === "string" ? req.body.currency : "USD";
+    const currency = typeof req.body.currency === "string" ? req.body.currency : "NGN";
 
     const tasks = Array.from({ length: attempts }, async (_, i) => {
       try {

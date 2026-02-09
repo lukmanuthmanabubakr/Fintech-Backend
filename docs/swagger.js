@@ -9,6 +9,16 @@ export const swaggerSpec = swaggerJSDoc({
       description: "Auth + Wallet + Transactions API",
     },
     servers: [{ url: "http://localhost:5000" }],
+    security: [{ bearerAuth: [] }],
+
+    // 👇 ADD THIS
+    tags: [
+      { name: "Auth", description: "User registration and login" },
+      { name: "Wallets", description: "Wallet actions (credit, debit)" },
+      { name: "Transactions", description: "User transaction history" },
+      { name: "Dev", description: "Development-only endpoints" }
+    ],
+
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -19,5 +29,6 @@ export const swaggerSpec = swaggerJSDoc({
       },
     },
   },
-  apis: ["./src/modules/**/*.routes.js"], // we’ll put docs in routes files
+
+  apis: ["./src/modules/**/*.routes.js"],
 });
