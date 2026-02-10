@@ -1,4 +1,5 @@
 import { creditWallet, debitWallet } from "./wallets.service.js";
+import { nairaToKobo } from "../../utils/money.js";
 
 function toInt(value, fieldName) {
   const n = Number(value);
@@ -20,18 +21,39 @@ function toPositiveInt(value, fieldName) {
   return n;
 }
 
+function toCurrency(value) {
+  return typeof value === "string" && value.trim() ? value.trim() : "NGN";
+}
+
+// ✅ amount here is NAIRA (user-friendly)
+// convert to KOBO (db-friendly)
+function toKobo(amountNaira) {
+  const kobo = nairaToKobo(amountNaira);
+  if (!kobo) {
+    const err = new Error("amount must be a valid naira value");
+    err.statusCode = 400;
+    throw err;
+  }
+  return kobo;
+}
+
 /**
- * TEST CREDIT
- * This is for dev/testing only.
- * You can choose any userId to credit.
+ * TEST CREDIT (DEV ONLY)
+ * Credits ANY userId (not the logged-in user).
+ * amount is NAIRA -> converted to KOBO.
  */
 export async function testCredit(req, res, next) {
   try {
     const userId = toPositiveInt(req.body.userId, "userId");
-    const amount = toPositiveInt(req.body.amount, "amount");
-    const currency = typeof req.body.currency === "string" ? req.body.currency : "NGN";
+    const currency = toCurrency(req.body.currency);
 
-    const result = await creditWallet({ userId, amount, currency });
+    const amountKobo = toKobo(req.body.amount);
+
+    const result = await creditWallet({
+      userId,
+      amount: amountKobo,
+      currency,
+    });
 
     return res.json({
       success: true,
@@ -44,17 +66,22 @@ export async function testCredit(req, res, next) {
 }
 
 /**
- * TEST DEBIT
- * This is for dev/testing only.
- * You can choose any userId to debit.
+ * TEST DEBIT (DEV ONLY)
+ * Debits ANY userId.
+ * amount is NAIRA -> converted to KOBO.
  */
 export async function testDebit(req, res, next) {
   try {
     const userId = toPositiveInt(req.body.userId, "userId");
-    const amount = toPositiveInt(req.body.amount, "amount");
-    const currency = typeof req.body.currency === "string" ? req.body.currency : "NGN";
+    const currency = toCurrency(req.body.currency);
 
-    const result = await debitWallet({ userId, amount, currency });
+    const amountKobo = toKobo(req.body.amount);
+
+    const result = await debitWallet({
+      userId,
+      amount: amountKobo,
+      currency,
+    });
 
     return res.json({
       success: true,
@@ -67,21 +94,28 @@ export async function testDebit(req, res, next) {
 }
 
 /**
- * CONCURRENCY TEST
- * Sends multiple debits at the same time to the same wallet.
- * Goal: only some should succeed, others should fail with "Insufficient balance".
+ * CONCURRENCY TEST (DEV ONLY)
+ * Runs MANY debits at once for same user wallet.
+ * amount is NAIRA -> converted to KOBO.
  */
 export async function testConcurrency(req, res, next) {
   try {
     const userId = toPositiveInt(req.body.userId, "userId");
-    const amount = toPositiveInt(req.body.amount, "amount");
+    const currency = toCurrency(req.body.currency);
+
+    const amountKobo = toKobo(req.body.amount);
+
     const attemptsRaw = toInt(req.body.attempts, "attempts");
-    const attempts = Math.min(Math.max(attemptsRaw, 1), 50); // clamp 1..50
-    const currency = typeof req.body.currency === "string" ? req.body.currency : "NGN";
+    const attempts = Math.min(Math.max(attemptsRaw, 1), 50);
 
     const tasks = Array.from({ length: attempts }, async (_, i) => {
       try {
-        const r = await debitWallet({ userId, amount, currency });
+        const r = await debitWallet({
+          userId,
+          amount: amountKobo,
+          currency,
+        });
+
         return { ok: true, index: i, transactionId: r.id, status: r.status };
       } catch (e) {
         return { ok: false, index: i, error: e.message };

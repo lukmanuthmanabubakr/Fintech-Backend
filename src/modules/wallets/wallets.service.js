@@ -15,6 +15,42 @@ async function getClearingWallet(tx, currency = "NGN") {
   return w;
 }
 
+//Used by webhook: credit wallet + ledger using an existing transactionId
+export async function creditWalletFromWebhook(tx, { transactionId, userId, amount, currency = "NGN" }) {
+  const userWallet = await tx.wallet.findUnique({
+    where: { userId },
+    select: { id: true },
+  });
+
+  if (!userWallet) {
+    const err = new Error("User wallet not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const clearing = await getClearingWallet(tx, currency);
+
+  // update balances
+  await tx.wallet.update({
+    where: { id: userWallet.id },
+    data: { balance: { increment: amount } },
+  });
+
+  await tx.wallet.update({
+    where: { id: clearing.id },
+    data: { balance: { decrement: amount } },
+  });
+
+  // ledger entries (double-entry)
+  await tx.ledgerEntry.createMany({
+    data: [
+      { transactionId, walletId: userWallet.id, entryType: "CREDIT", amount },
+      { transactionId, walletId: clearing.id, entryType: "DEBIT", amount },
+    ],
+  });
+}
+
+
 function makeRef() {
   return `TX-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 }
@@ -143,3 +179,4 @@ export async function debitWallet({ userId, amount, currency = "NGN" }) {
     });
   });
 }
+

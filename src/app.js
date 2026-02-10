@@ -9,6 +9,9 @@ import { swaggerSpec } from "../docs/swagger.js";
 import walletsRoutes from "./modules/wallets/wallets.routes.js";
 import transactionsRoutes from "./modules/transactions/transactions.routes.js";
 import paymentsRoutes from "./modules/payments/payments.routes.js";
+import webhooksRoutes from "./modules/webhooks/webhooks.routes.js";
+
+
 
 
 
@@ -16,7 +19,13 @@ import paymentsRoutes from "./modules/payments/payments.routes.js";
 
 const app = express();
 
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(cors());
 app.use(helmet());
 
@@ -39,6 +48,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/wallets", walletsRoutes);
 app.use("/api/v1/transactions", transactionsRoutes);
 app.use("/api/v1/payments", paymentsRoutes);
+app.use("/api/v1/webhooks", webhooksRoutes);
+
 
 
 

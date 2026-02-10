@@ -6,7 +6,11 @@ function makeRef() {
   return `TX-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 }
 
-export async function initializeDeposit({ userId, amountNaira }) {
+export async function initializeDeposit({
+  userId,
+  amountNaira,
+  idempotencyKey,
+}) {
   const amountKobo = nairaToKobo(amountNaira);
   if (!amountKobo) {
     const err = new Error("amount must be a valid naira value");
@@ -27,6 +31,20 @@ export async function initializeDeposit({ userId, amountNaira }) {
 
   const reference = makeRef();
 
+  if (idempotencyKey) {
+    const existing = await prisma.transaction.findFirst({
+      where: { userId, idempotencyKey },
+      select: { id: true, reference: true, amount: true, status: true },
+    });
+
+    if (existing) {
+      return {
+        transaction: existing,
+        alreadyExists: true,
+      };
+    }
+  }
+
   const txn = await prisma.transaction.create({
     data: {
       userId,
@@ -34,6 +52,7 @@ export async function initializeDeposit({ userId, amountNaira }) {
       amount: amountKobo,
       status: "PENDING",
       reference,
+      idempotencyKey: idempotencyKey || null,
     },
     select: { id: true, reference: true, amount: true, status: true },
   });
