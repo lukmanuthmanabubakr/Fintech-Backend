@@ -64,7 +64,6 @@ export async function initializeDeposit({
     reference,
   });
 
-  // keep it simple: return the URL; we don't need to save paystack response yet
   return {
     transaction: txn,
     authorizationUrl: paystackData.authorization_url,
