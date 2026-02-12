@@ -57,7 +57,7 @@ export async function initializeDeposit({
     select: { id: true, reference: true, amount: true, status: true },
   });
 
-  // 2) call Paystack initialize
+  // 2)Funtion to  call Paystack initialize
   const paystackData = await paystackInitializeTransaction({
     email: user.email,
     amountKobo,
