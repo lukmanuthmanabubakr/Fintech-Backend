@@ -15,38 +15,81 @@ function verifyPaystackSignature(req) {
 }
 
 export async function paystackWebhook(req, res) {
+  let logId = null;
+
   try {
+    const signature = req.headers["x-paystack-signature"] || null;
+    const event = req.body;
+
+    const eventType = event?.event || "unknown";
+    const reference = event?.data?.reference || null;
+
+    // Day 5–6: log webhook FIRST (evidence)
+    try {
+      const log = await prisma.webhookEvent.create({
+        data: {
+          provider: "PAYSTACK",
+          eventType,
+          reference,
+          signature,
+          payload: event,
+        },
+        select: { id: true },
+      });
+      logId = log.id;
+    } catch (e) {
+      // If unique constraint hits (duplicate), it's fine.
+      // We'll still keep the webhook idempotent.
+    }
+
     const ok = verifyPaystackSignature(req);
     if (!ok) {
+      if (logId) {
+        await prisma.webhookEvent.update({
+          where: { id: logId },
+          data: { errorMessage: "Invalid signature" },
+        });
+      }
       return res.status(401).json({ success: false, message: "Invalid signature" });
     }
 
-    const event = req.body;
-
-    if (event?.event !== "charge.success") {
+    // Only handle successful payment
+    if (eventType !== "charge.success") {
+      if (logId) {
+        await prisma.webhookEvent.update({
+          where: { id: logId },
+          data: { processed: true, processedAt: new Date() },
+        });
+      }
       return res.json({ received: true });
     }
 
-    const paystackRef = event?.data?.reference;
-    const amountPaid = event?.data?.amount;
+    const amountPaid = event?.data?.amount; // kobo
     const currency = event?.data?.currency || "NGN";
 
-    if (!paystackRef || !amountPaid) {
+    if (!reference || !amountPaid) {
+      if (logId) {
+        await prisma.webhookEvent.update({
+          where: { id: logId },
+          data: { errorMessage: "Missing reference or amount" },
+        });
+      }
       return res.json({ received: true });
     }
 
     await prisma.$transaction(async (tx) => {
       const txn = await tx.transaction.findUnique({
-        where: { reference: paystackRef },
+        where: { reference },
         select: { id: true, userId: true, status: true, amount: true, type: true },
       });
 
       if (!txn) return;
-
       if (txn.type !== "DEPOSIT") return;
 
+      // idempotency: already SUCCESS => do nothing
       if (txn.status === "SUCCESS") return;
 
+      // extra safety: confirm amount matches what you created on initialize
       if (txn.amount !== amountPaid) {
         await tx.transaction.update({
           where: { id: txn.id },
@@ -55,6 +98,7 @@ export async function paystackWebhook(req, res) {
         return;
       }
 
+      // atomic update (prevents double success)
       const updated = await tx.transaction.updateMany({
         where: { id: txn.id, status: "PENDING" },
         data: { status: "SUCCESS" },
@@ -68,10 +112,31 @@ export async function paystackWebhook(req, res) {
         amount: txn.amount,
         currency,
       });
+
+      // mark log processed inside same transaction
+      if (logId) {
+        await tx.webhookEvent.update({
+          where: { id: logId },
+          data: { processed: true, processedAt: new Date() },
+        });
+      }
     });
 
     return res.json({ received: true });
   } catch (err) {
-    return res.status(500).json({ success: false, message: "Webhook error", error: err.message });
+    if (logId) {
+      try {
+        await prisma.webhookEvent.update({
+          where: { id: logId },
+          data: { errorMessage: err.message },
+        });
+      } catch {}
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Webhook error",
+      error: err.message,
+    });
   }
 }
