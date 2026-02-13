@@ -11,12 +11,12 @@ export const swaggerSpec = swaggerJSDoc({
     servers: [{ url: "http://localhost:5000" }],
     security: [{ bearerAuth: [] }],
 
-    // 👇 ADD THIS
+    // ADD THIS
     tags: [
       { name: "Auth", description: "User registration and login" },
       { name: "Wallets", description: "Wallet actions (credit, debit)" },
       { name: "Transactions", description: "User transaction history" },
-      { name: "Dev", description: "Development-only endpoints" }
+      { name: "Dev", description: "Development-only endpoints" },
     ],
 
     components: {
@@ -30,5 +30,11 @@ export const swaggerSpec = swaggerJSDoc({
     },
   },
 
-  apis: ["./src/modules/**/*.routes.js"],
+  apis: [
+    "./src/modules/auth/**/*.routes.js",
+    "./src/modules/wallets/**/*.routes.js",
+    "./src/modules/payments/**/*.routes.js",
+    "./src/modules/webhooks/**/*.routes.js",
+    "./src/modules/transactions/**/*.routes.js",
+  ],
 });
