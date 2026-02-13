@@ -15,7 +15,7 @@ async function getClearingWallet(tx, currency = "NGN") {
   return w;
 }
 
-//Used by webhook: credit wallet + ledger using an existing transactionId
+//Used by webhook: credit wallet + ledger using an existing transactionId.
 export async function creditWalletFromWebhook(tx, { transactionId, userId, amount, currency = "NGN" }) {
   const userWallet = await tx.wallet.findUnique({
     where: { userId },
