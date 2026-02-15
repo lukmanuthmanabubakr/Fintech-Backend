@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { login, refresh, register } from "./auth.controller.js";
 import { requireAuth } from "../../middlewares/auth.middleware.js";
+import { authLimiter } from "../../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 
@@ -52,7 +53,7 @@ router.post("/register", register);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/login", login);
+router.post("/login", authLimiter, login);
 
 /**
  * @openapi

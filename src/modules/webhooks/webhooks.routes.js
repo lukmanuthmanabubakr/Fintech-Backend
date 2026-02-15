@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { paystackWebhook } from "./paystack.webhook.js";
+import { webhooksLimiter } from "../../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 
@@ -14,10 +15,10 @@ const router = Router();
  * @openapi
  * /api/v1/webhooks/paystack:
  *   post:
- *     summary: Paystack webhook endpoint. 
-This route is called automatically by Paystack after a successful payment.
-It verifies the Paystack signature, marks the transaction SUCCESS, and credits the wallet.
-
+ *     summary: Paystack webhook endpoint.
+ *     description: |
+ *       This route is called automatically by Paystack after a successful payment.
+ *       It verifies the Paystack signature, marks the transaction SUCCESS, and credits the wallet.
  *     tags: [Webhooks]
  *     parameters:
  *       - in: header
@@ -54,6 +55,6 @@ It verifies the Paystack signature, marks the transaction SUCCESS, and credits t
  *       401:
  *         description: Invalid signature
  */
-router.post("/paystack", paystackWebhook);
+router.post("/paystack", webhooksLimiter, paystackWebhook);
 
 export default router;

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth } from "../../middlewares/auth.middleware.js";
 import { initializePayment } from "./payments.controller.js";
+import { paymentsLimiter } from "../../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 
@@ -39,6 +40,6 @@ const router = Router();
  *       401:
  *         description: Missing or invalid token
  */
-router.post("/initialize", requireAuth, initializePayment);
+router.post("/initialize", requireAuth, paymentsLimiter, initializePayment);
 
 export default router;

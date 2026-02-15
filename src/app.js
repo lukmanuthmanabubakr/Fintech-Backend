@@ -26,8 +26,20 @@ app.use(
     },
   })
 );
-app.use(cors());
-app.use(helmet());
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000").split(",");
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.use(helmet({ contentSecurityPolicy: false }));
 
 app.get("/", (req, res) => {
   res.send("Fintech backend running...");
