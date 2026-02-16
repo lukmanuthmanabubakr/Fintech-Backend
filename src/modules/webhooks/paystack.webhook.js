@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "../../config/db.js";
 import { creditWalletFromWebhook } from "../wallets/wallets.service.js";
+import { paystackWebhookSchema } from "./webhooks.validation.js";
 
 function verifyPaystackSignature(req) {
   const signature = req.headers["x-paystack-signature"];
@@ -21,8 +22,11 @@ export async function paystackWebhook(req, res) {
     const signature = req.headers["x-paystack-signature"] || null;
     const event = req.body;
 
-    const eventType = event?.event || "unknown";
-    const reference = event?.data?.reference || null;
+    // Validate webhook payload structure first
+    const validatedEvent = paystackWebhookSchema.parse(event);
+
+    const eventType = validatedEvent.event;
+    const reference = validatedEvent.data.reference;
 
     // Day 5–6: log webhook FIRST (evidence)
     try {
@@ -64,8 +68,8 @@ export async function paystackWebhook(req, res) {
       return res.json({ received: true });
     }
 
-    const amountPaid = event?.data?.amount; // kobo
-    const currency = event?.data?.currency || "NGN";
+    const amountPaid = validatedEvent.data.amount; // kobo
+    const currency = validatedEvent.data.currency || "NGN";
 
     if (!reference || !amountPaid) {
       if (logId) {

@@ -1,4 +1,4 @@
-import { loginSchema, registerSchema } from "./auth.validation.js";
+import { loginSchema, registerSchema, refreshSchema } from "./auth.validation.js";
 import { loginUser, refreshTokens, registerUser } from "./auth.service.js";
 
 export async function register(req, res, next) {
@@ -39,16 +39,9 @@ export async function login(req, res, next) {
 
 export async function refresh(req, res, next) {
   try {
-    const { refreshToken } = req.body;
+    const payload = refreshSchema.parse(req.body);
 
-    if (!refreshToken || typeof refreshToken !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "refreshToken is required",
-      });
-    }
-
-    const tokens = await refreshTokens(refreshToken);
+    const tokens = await refreshTokens(payload.refreshToken);
 
     return res.json({
       success: true,

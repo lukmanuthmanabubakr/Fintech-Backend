@@ -1,13 +1,14 @@
 import { initializeDeposit } from "./payments.service.js";
+import { initializePaymentSchema } from "./payments.validation.js";
 
 export async function initializePayment(req, res, next) {
   try {
+    const payload = initializePaymentSchema.parse(req.body);
     const userId = Number(req.user.sub);
-    const { amount } = req.body;
 
     const result = await initializeDeposit({
       userId,
-      amountNaira: amount,
+      amountNaira: payload.amount,
     });
 
     return res.status(201).json({
