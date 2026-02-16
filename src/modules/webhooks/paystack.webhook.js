@@ -22,7 +22,7 @@ export async function paystackWebhook(req, res) {
     const signature = req.headers["x-paystack-signature"] || null;
     const event = req.body;
 
-    // Validate webhook payload structure first
+    // Validate webhook payload structure first.
     const validatedEvent = paystackWebhookSchema.parse(event);
 
     const eventType = validatedEvent.event;
