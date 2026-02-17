@@ -1,18 +1,17 @@
-import { logger } from "../utils/logger.js";
+import { logger } from "../config/logger.js";
 
 export function errorMiddleware(err, req, res, next) {
   const status = err.statusCode || 500;
 
-  try {
-    logger.error(err.message || 'Unhandled error', {
-      path: req.originalUrl,
-      method: req.method,
-      body: req.body,
-      stack: err.stack,
-    });
-  } catch (e) {
-    console.error('Failed to log error', e);
-  }
+  logger.error({
+    message: err.message || 'Unhandled error',
+    path: req.originalUrl,
+    method: req.method,
+    ip: req.ip,
+    userId: req.user?.sub,
+    statusCode: status,
+    stack: err.stack,
+  });
 
   if (err.name === "ZodError") {
     return res.status(422).json({

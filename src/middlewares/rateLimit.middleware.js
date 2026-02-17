@@ -1,5 +1,5 @@
 import rateLimit from "express-rate-limit";
-import { logger } from "../utils/logger.js";
+import { logger } from "../config/logger.js";
 
 const createLimiter = ({ windowMs, max }) =>
   rateLimit({
@@ -8,11 +8,12 @@ const createLimiter = ({ windowMs, max }) =>
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req, res) => {
-      try {
-        logger.warn("Rate limit exceeded", { path: req.originalUrl, ip: req.ip, method: req.method });
-      } catch (e) {
-        console.warn("Failed to log rate limit event", e);
-      }
+      logger.warn({
+        event: 'rate_limit_exceeded',
+        path: req.originalUrl,
+        ip: req.ip,
+        method: req.method,
+      });
       res.status(429).json({ success: false, message: "Too many requests, please try again later." });
     },
   });

@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { prisma } from "../../config/db.js";
 import { creditWalletFromWebhook } from "../wallets/wallets.service.js";
 import { paystackWebhookSchema } from "./webhooks.validation.js";
+import { logger } from "../../config/logger.js";
 
 function verifyPaystackSignature(req) {
   const signature = req.headers["x-paystack-signature"];
@@ -21,7 +22,13 @@ export async function paystackWebhook(req, res) {
   try {
     const signature = req.headers["x-paystack-signature"] || null;
     const event = req.body;
-
+    logger.debug({
+      event: 'webhook_received',
+      provider: 'paystack',
+      eventType: event?.event,
+      reference: event?.data?.reference,
+      ip: req.ip,
+    });
     // Validate webhook payload structure first.
     const validatedEvent = paystackWebhookSchema.parse(event);
 
@@ -48,6 +55,13 @@ export async function paystackWebhook(req, res) {
 
     const ok = verifyPaystackSignature(req);
     if (!ok) {
+      logger.warn({
+        event: 'webhook_signature_verification_failed',
+        provider: 'paystack',
+        reference,
+        eventType,
+        ip: req.ip,
+      });
       if (logId) {
         await prisma.webhookEvent.update({
           where: { id: logId },
@@ -99,6 +113,12 @@ export async function paystackWebhook(req, res) {
           where: { id: txn.id },
           data: { status: "FAILED" },
         });
+        logger.warn({
+          event: 'webhook_amount_mismatch',
+          reference,
+          expectedAmount: txn.amount,
+          receivedAmount: amountPaid,
+        });
         return;
       }
 
@@ -124,10 +144,26 @@ export async function paystackWebhook(req, res) {
           data: { processed: true, processedAt: new Date() },
         });
       }
+
+      logger.info({
+        event: 'webhook_payment_processed',
+        reference,
+        userId: txn.userId,
+        amount: txn.amount,
+        currency,
+      });
     });
 
     return res.json({ received: true });
   } catch (err) {
+    logger.error({
+      event: 'webhook_error',
+      reference: event?.data?.reference,
+      eventType: event?.event,
+      error: err.message,
+      ip: req.ip,
+    });
+
     if (logId) {
       try {
         await prisma.webhookEvent.update({
