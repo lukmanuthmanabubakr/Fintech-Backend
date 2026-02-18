@@ -8,7 +8,7 @@ export function requireAuth(req, res, next) {
     if (type !== "Bearer" || !token) {
       return res.status(401).json({
         success: false,
-        message: "Missing or invalid Authorization header",
+        message: "Missing or invalid Authorization header.",
       });
     }
 
@@ -19,7 +19,7 @@ export function requireAuth(req, res, next) {
   } catch (err) {
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired token",
+      message: "Invalid or expired token.",
     });
   }
 }
