@@ -25,6 +25,8 @@ model Session {
   refreshToken String
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
+
+  @@index([userId])  // speeds up: find all sessions for a user (logout, refresh)
 }
 
 enum TransactionType {
@@ -74,6 +76,9 @@ model Transaction {
   entries        LedgerEntry[]
 
   @@unique([userId, idempotencyKey])
+  @@index([userId])                    // speeds up: fetch all transactions for a user
+  @@index([userId, createdAt(sort: Desc)]) // speeds up: paginated history (sorted newest first)
+  @@index([status])                   // speeds up: filter by PENDING / SUCCESS / FAILED
 }
 
 
@@ -88,6 +93,9 @@ model LedgerEntry {
 
   transaction   Transaction    @relation(fields: [transactionId], references: [id])
   wallet        Wallet         @relation(fields: [walletId], references: [id])
+
+  @@index([transactionId])  // speeds up: load all entries for a transaction
+  @@index([walletId])       // speeds up: load all entries for a wallet
 }
 
 model WebhookEvent {
