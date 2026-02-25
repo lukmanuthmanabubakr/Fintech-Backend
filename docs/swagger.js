@@ -8,7 +8,7 @@ export const swaggerSpec = swaggerJSDoc({
       version: "1.0.0",
       description: "Auth + Wallet + Transactions API",
     },
-    servers: [{ url: "http://localhost:5000" }],
+    servers: [{ url: "http://localhost:5900" }],
     security: [{ bearerAuth: [] }],
 
     // ADD THIS
