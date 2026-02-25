@@ -1,6 +1,10 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../../config/db.js";
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../../utils/tokens.js";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} from "../../utils/tokens.js";
 
 export async function registerUser({ fullName, email, password }) {
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -47,7 +51,7 @@ export async function loginUser({ email, password }) {
     throw err;
   }
 
-  const payload = { sub: user.id, email: user.email };
+  const payload = { sub: user.id, email: user.email, role: user.role };
 
   const accessToken = signAccessToken(payload);
   const refreshToken = signRefreshToken(payload);
@@ -90,9 +94,16 @@ export async function refreshTokens(refreshToken) {
     throw err;
   }
 
-  const newAccessToken = signAccessToken({ sub: userId, email: payload.email });
-
-  const newRefreshToken = signRefreshToken({ sub: userId, email: payload.email });
+  const newAccessToken = signAccessToken({
+    sub: userId,
+    email: payload.email,
+    role: payload.role,
+  });
+  const newRefreshToken = signRefreshToken({
+    sub: userId,
+    email: payload.email,
+    role: payload.role,
+  });
 
   await prisma.session.delete({ where: { id: session.id } });
   await prisma.session.create({

@@ -26,7 +26,7 @@ app.use(
     },
   })
 );
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000").split(",");
+const allowedOrigins = (process.env.CORS_ORIGIN).split(",");
 
 const corsOptions = {
   origin: (origin, callback) => {

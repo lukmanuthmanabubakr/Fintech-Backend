@@ -6,17 +6,25 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   fullName  String
   email     String   @unique
   password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  sessions  Session[]
-  wallet       Wallet?
-  transactions Transaction[]
 
+  sessions          Session[]
+  wallet            Wallet?
+  transactions      Transaction[]
+  receivedTransfers Transaction[] @relation("ReceivedTransfers")
+  kycRecord         KycRecord?
 }
 
 model Session {
@@ -64,6 +72,7 @@ model Wallet {
 model Transaction {
   id             Int               @id @default(autoincrement())
   userId         Int
+  recipientId    Int?              // <-- ADD THIS (nullable, only used for TRANSFER)
   type           TransactionType
   amount         Int
   status         TransactionStatus @default(PENDING)
@@ -73,12 +82,14 @@ model Transaction {
   updatedAt      DateTime          @updatedAt
 
   user           User              @relation(fields: [userId], references: [id])
+  recipient      User?             @relation("ReceivedTransfers", fields: [recipientId], references: [id])  // <-- ADD THIS
   entries        LedgerEntry[]
 
   @@unique([userId, idempotencyKey])
-  @@index([userId])                    // speeds up: fetch all transactions for a user
-  @@index([userId, createdAt(sort: Desc)]) // speeds up: paginated history (sorted newest first)
-  @@index([status])                   // speeds up: filter by PENDING / SUCCESS / FAILED
+  @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status])
+  @@index([recipientId])           // <-- ADD THIS INDEX TOO
 }
 
 
@@ -111,4 +122,25 @@ model WebhookEvent {
   createdAt     DateTime @default(now())
 
   @@unique([provider, reference, eventType])
+}
+
+enum KycStatus {
+  NOT_SUBMITTED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model KycRecord {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @unique
+  status      KycStatus @default(NOT_SUBMITTED)
+  bvn         String?
+  nin         String?
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id])
 }
