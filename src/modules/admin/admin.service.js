@@ -25,10 +25,17 @@ export async function getAllUsers({ page = 1, limit = 20 }) {
   return { users, total, page, limit };
 }
 
-export async function getAllTransactions({ page = 1, limit = 20, status }) {
+export async function getAllTransactions({ page = 1, limit = 20, status, email }) {
   const skip = (page - 1) * limit;
 
-  const where = status ? { status } : {};
+  const where = {
+    ...(status && { status }),
+    ...(email && {
+      user: {
+        email: { contains: email, mode: "insensitive" },
+      },
+    }),
+  };
 
   const [transactions, total] = await Promise.all([
     prisma.transaction.findMany({

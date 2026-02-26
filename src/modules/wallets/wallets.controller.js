@@ -1,4 +1,4 @@
-import { creditWallet, debitWallet } from "./wallets.service.js";
+import { creditWallet, debitWallet, transferFunds } from "./wallets.service.js";
 import { nairaToKobo } from "../../utils/money.js";
 import { formatTransactionForUser } from "../../utils/formatters.js";
 
@@ -57,6 +57,38 @@ export async function debit(req, res, next) {
       data: formatTransactionForUser(result),
     });
 
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function transfer(req, res, next) {
+  try {
+    const senderId = req.user.sub;
+    const { recipientEmail, amountNaira } = req.body;
+
+    if (!recipientEmail || !amountNaira) {
+      return res.status(400).json({
+        success: false,
+        message: "recipientEmail and amountNaira are required",
+      });
+    }
+
+    const amountKobo = nairaToKobo(amountNaira);
+    if (!amountKobo) {
+      return res.status(400).json({
+        success: false,
+        message: "Amount must be a valid naira value greater than zero",
+      });
+    }
+
+    const result = await transferFunds({
+      senderId,
+      recipientEmail,
+      amount: amountKobo,
+    });
+
+    res.json({ success: true, data: result });
   } catch (err) {
     next(err);
   }
