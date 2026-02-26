@@ -281,7 +281,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
       data: { balance: { increment: amount } },
     });
 
-    // Step 10 — Write ledger entries
+    // Step 10 — Write ledger entries.
     await tx.ledgerEntry.createMany({
       data: [
         { transactionId: txn.id, walletId: senderWallet.id, entryType: "DEBIT", amount },
