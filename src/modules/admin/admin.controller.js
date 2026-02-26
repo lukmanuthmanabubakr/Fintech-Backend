@@ -21,8 +21,9 @@ export async function getTransactions(req, res, next) {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const status = req.query.status || null;
+    const email = req.query.email || null;  // ADD THIS
 
-    const result = await adminService.getAllTransactions({ page, limit, status });
+    const result = await adminService.getAllTransactions({ page, limit, status, email });
 
     res.json({
       success: true,

@@ -46,7 +46,7 @@
 
 
 import { Router } from "express";
-import { credit, debit } from "./wallets.controller.js";
+import { credit, debit, transfer } from "./wallets.controller.js";
 import { requireAuth } from "../../middlewares/auth.middleware.js";
 import { testConcurrency, testCredit, testDebit } from "./wallets.test.controller.js";
 
@@ -171,7 +171,7 @@ router.post("/test/debit", requireAuth, testDebit);
  *         description: Concurrency test result summary
  */
 router.post("/test/concurrency", requireAuth, testConcurrency);
-
+router.post("/transfer", requireAuth, transfer);
 
 
 export default router;
