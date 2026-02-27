@@ -258,7 +258,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
       },
     });
 
-    // Step 8 — Debit sender conditionally (prevents negative balance + race condition)
+    // Step 8 — Debit sender conditionally (prevents negative balance + race condition..)
     const debited = await tx.wallet.updateMany({
       where: { id: senderWallet.id, balance: { gte: amount } },
       data: { balance: { decrement: amount } },
@@ -275,7 +275,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
       throw err;
     }
 
-    // Step 9 — Credit recipient
+    // Step 9 — Credit recipient.
     await tx.wallet.update({
       where: { id: recipientWallet.id },
       data: { balance: { increment: amount } },
@@ -289,7 +289,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
       ],
     });
 
-    // Step 11 — Mark success and return
+    // Step 11 — Mark success and return.
     return tx.transaction.update({
       where: { id: txn.id },
       data: { status: "SUCCESS" },
