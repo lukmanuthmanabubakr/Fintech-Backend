@@ -246,7 +246,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
       throw err;
     }
 
-    // Step 7 — Create transaction intent.
+    // Step 7 —> Create transaction intent.
     const txn = await tx.transaction.create({
       data: {
         userId: senderId,
