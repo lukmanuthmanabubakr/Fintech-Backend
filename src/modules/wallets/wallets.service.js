@@ -246,7 +246,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
       throw err;
     }
 
-    // Step 7 — Create transaction intent
+    // Step 7 — Create transaction intent.
     const txn = await tx.transaction.create({
       data: {
         userId: senderId,
@@ -258,7 +258,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
       },
     });
 
-    // Step 8 — Debit sender conditionally (prevents negative balance + race condition..)
+    // Step 8 — Debit sender conditionally (prevents negative balance + race condition)
     const debited = await tx.wallet.updateMany({
       where: { id: senderWallet.id, balance: { gte: amount } },
       data: { balance: { decrement: amount } },
