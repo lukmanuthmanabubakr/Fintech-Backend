@@ -201,7 +201,7 @@ export async function transferFunds({ senderId, recipientEmail, amount }) {
     throw err;
   }
 
-  // Step 3 — Prevent self transfer
+  // Step 3 — This Prevent self transfer
   if (senderId === recipient.id) {
     const err = new Error("You cannot transfer to yourself");
     err.statusCode = 400;
