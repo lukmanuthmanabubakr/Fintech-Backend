@@ -11,6 +11,7 @@ import transactionsRoutes from "./modules/transactions/transactions.routes.js";
 import paymentsRoutes from "./modules/payments/payments.routes.js";
 import webhooksRoutes from "./modules/webhooks/webhooks.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
+import kycRoutes from "./modules/kyc/kyc.routes.js";
 
 
 
@@ -43,7 +44,7 @@ app.use(cors(corsOptions));
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.get("/", (req, res) => {
-  res.send("Fintech backend running...");
+  res.send("Legend fintech backend running...");
 });
 
 app.get("/db-test", async (req, res, next) => {
@@ -63,7 +64,7 @@ app.use("/api/v1/transactions", transactionsRoutes);
 app.use("/api/v1/payments", paymentsRoutes);
 app.use("/api/v1/webhooks", webhooksRoutes);
 app.use("/api/v1/admin", adminRoutes);
-
+app.use("/api/v1/kyc", kycRoutes);
 
 
 
