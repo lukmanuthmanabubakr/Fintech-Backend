@@ -33,3 +33,23 @@ export async function getTransactions(req, res, next) {
     next(err);
   }
 }
+export async function getPendingKyc(req, res, next) {
+  try {
+    const result = await adminService.getPendingKyc();
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function reviewKyc(req, res, next) {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { status } = req.body;
+
+    const result = await adminService.reviewKyc({ userId, status });
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
