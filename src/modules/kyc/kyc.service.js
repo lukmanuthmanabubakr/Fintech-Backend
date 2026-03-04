@@ -2,7 +2,7 @@ import { prisma } from "../../config/db.js";
 
 export async function submitKyc({ userId, bvn, nin }) {
 
-  // Check if a KYC record already exists for this user
+  // Check if a KYC record already exists for this user.
   const existing = await prisma.kycRecord.findUnique({
     where: { userId },
     select: { status: true },
