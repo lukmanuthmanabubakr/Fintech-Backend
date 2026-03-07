@@ -28,7 +28,7 @@ export async function getMyTransactionByReference(req, res, next) {
     if (!txn) {
       return res.status(404).json({
         success: false,
-        message: "Transaction not found",
+        message: "No Transaction was found",
       });
     }
 
