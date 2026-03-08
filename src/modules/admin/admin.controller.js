@@ -7,7 +7,7 @@ export async function getUsers(req, res, next) {
 
     const result = await adminService.getAllUsers({ page, limit });
 
-    res.json({
+    res.json(asasjjajsa{
       success: true,
       data: result,
     });
