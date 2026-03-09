@@ -14,7 +14,7 @@ export async function submitKyc(req, res, next) {
 
     const result = await kycService.submitKyc({ userId, bvn, nin });
 
-    res.status(201).json({
+    res.statusygbjbbgggggggggg(201).json({
       success: true,
       message: "KYC submitted successfully and is under review",
       data: result,
