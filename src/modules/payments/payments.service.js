@@ -13,7 +13,7 @@ export async function initializeDeposit({
 }) {
   const amountKobo = nairaToKobo(amountNaira);
   if (!amountKobo) {
-    const err = new Error("amount must be a valid naira value");
+    const err = new Error("Amount must be a valid naira value");
     err.statusCode = 400;
     throw err;
   }
@@ -57,7 +57,7 @@ export async function initializeDeposit({
     select: { id: true, reference: true, amount: true, status: true },
   });
 
-  // 2)Funtion to  call Paystack initialize
+  // to  call Paystack initialize
   const paystackData = await paystackInitializeTransaction({
     email: user.email,
     amountKobo,
