@@ -8,7 +8,6 @@ const router = Router();
  * @openapi
  * tags:
  *   - name: Webhooks
- *     : Provider callbacks (Paystack). Not called by users.
  */
 
 /**
