@@ -88,7 +88,7 @@ router.post("/refresh", refresh);
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Returns token payload
+ *         description:
  *       401:
  *         description: Missing/invalid token
  */
