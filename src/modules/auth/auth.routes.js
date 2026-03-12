@@ -80,10 +80,7 @@ router.post("/refresh", refresh);
 
 /**
  * @openapi
- * /api/v1/auth/me:
- *   get:
- *     summary: Test protected route
- *     tags: [Auth]
+ 
  *     security:
  */
 

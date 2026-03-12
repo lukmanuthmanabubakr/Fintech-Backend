@@ -13,10 +13,7 @@ const router = Router();
 /**
  * @openapi
  * /api/v1/webhooks/paystack:
- *   post:
- *     summary: Paystack webhook endpoint.
- *     description: |
- *       This route is called automatically by Paystack after a successful payment.
+ * ically by Paystack after a successful payment.
  *       It verifies the Paystack signature, marks the transaction SUCCESS, and credits the wallet.
  *     tags: [Webhooks]
  *     parameters:
