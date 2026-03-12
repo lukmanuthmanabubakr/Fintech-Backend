@@ -85,12 +85,6 @@ router.post("/refresh", refresh);
  *     summary: Test protected route
  *     tags: [Auth]
  *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description:
- *       401:
- *         description: Missing/invalid token
  */
 
 router.get("/me", requireAuth, (req, res) => {
