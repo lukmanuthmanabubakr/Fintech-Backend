@@ -1,6 +1,7 @@
 import rateLimit from "express-rate-limit";
 import { logger } from "../config/logger.js";
 
+// create limiter
 const createLimiter = ({ windowMs, max }) =>
   rateLimit({
     windowMs,
