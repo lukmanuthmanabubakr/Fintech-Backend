@@ -9,7 +9,7 @@ const router = Router();
  * @openapi
  * tags:
  *   - name: Payments
- *     description: Deposit initialization (Paystack).
+ *      Deposit initialization (Paystack).
  */
 
 /**
