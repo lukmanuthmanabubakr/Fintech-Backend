@@ -7,8 +7,6 @@ const router = Router();
 /**
  * @openapi
  * /api/v1/:
- *   get:
- *     security:
  *       - bearerAuth: []
  *     summary: Get logged-in user's transaction history (statement)
  *     parameters:
