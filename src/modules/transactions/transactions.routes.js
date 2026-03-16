@@ -6,7 +6,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/v1/transactions:
+ * /api/v1/:
  *   get:
  *     security:
  *       - bearerAuth: []
