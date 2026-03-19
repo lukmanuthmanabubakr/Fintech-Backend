@@ -9,7 +9,7 @@ const router = Router();
  * @openapi
  * /api/v1/auth/register:
  *   post:
- *     summary: Register a new user
+ *     summary: To Register a new user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
