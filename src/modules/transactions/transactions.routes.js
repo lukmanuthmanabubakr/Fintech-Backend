@@ -7,7 +7,6 @@ const router = Router();
 /**
  * @openapi
  *     summary: Get logged-in user's transaction history (statement)
- *     parameters:
  *       - in: query
  *         name: page
  *         schema:
