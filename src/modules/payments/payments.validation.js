@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Schema for initializing a deposit payment
+ * This schema for initializing a deposit payment
  * amount: user provides in NAIRA (e.g., 2000 for 2000 naira)
  * server converts to kobo internally
  */
