@@ -5,6 +5,7 @@ import * as kycController from "./kyc.controller.js";
 const router = Router();
 // Upload Kyc routes
 router.post("/submit", requireAuth, kycController.submitKyc);
+// Check Kyc
 router.get("/status", requireAuth, kycController.getKycStatus);
 
 export default router;
