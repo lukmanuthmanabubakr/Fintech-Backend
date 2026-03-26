@@ -1,5 +1,6 @@
 import * as adminService from "./admin.service.js";
 
+// Admin Get all users - Onky Admin
 export async function getUsers(req, res, next) {
   try {
     const page = parseInt(req.query.page) || 1;
