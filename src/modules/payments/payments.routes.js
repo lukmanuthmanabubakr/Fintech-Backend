@@ -15,7 +15,7 @@ const router = Router();
  * @openapi
  * /api/v1/payments/initialize:
  *   post:
- *     summary: Initialize a deposit (creates PENDING transaction + returns Paystack checkout URL)
+ *     summary: Initialize a deposit payment (creates PENDING transaction + returns Paystack checkout URL)
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
