@@ -2,6 +2,8 @@ import { creditWallet, debitWallet, transferFunds } from "./wallets.service.js";
 import { nairaToKobo } from "../../utils/money.js";
 import { formatTransactionForUser } from "../../utils/formatters.js";
 
+
+// Credit alert function
 export async function credit(req, res, next) {
   try {
     const userId = Number(req.user.sub);
