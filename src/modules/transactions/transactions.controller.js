@@ -1,6 +1,7 @@
 import { fetchTransactionByReference, fetchUserTransactions } from "./transactions.service.js";
 import { formatTransactionForUser, formatTransactionsForUser } from "../../utils/formatters.js";
 
+// Getting Transaction history 
 export async function getMyTransactions(req, res, next) {
   try {
     const userId = Number(req.user.sub);
